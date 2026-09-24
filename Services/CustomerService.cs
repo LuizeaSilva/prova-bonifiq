@@ -7,11 +7,13 @@ namespace ProvaPub.Services
 {
     public class CustomerService
     {
-        TestDbContext _ctx;
+        private readonly TestDbContext _ctx;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CustomerService(TestDbContext ctx)
+        public CustomerService(TestDbContext ctx, IDateTimeProvider dateTimeProvider)
         {
             _ctx = ctx;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public PagedList<Customer> ListCustomers(int page)
@@ -31,8 +33,10 @@ namespace ProvaPub.Services
             var customer = await _ctx.Customers.FindAsync(customerId);
             if (customer == null) throw new InvalidOperationException($"Customer Id {customerId} does not exists");
 
+            var now = _dateTimeProvider.UtcNow;
+
             //Business Rule: A customer can purchase only a single time per month
-            var baseDate = DateTime.UtcNow.AddMonths(-1);
+            var baseDate = now.AddMonths(-1);
             var ordersInThisMonth = await _ctx.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= baseDate);
             if (ordersInThisMonth > 0)
                 return false;
@@ -43,7 +47,7 @@ namespace ProvaPub.Services
                 return false;
 
             //Business Rule: A customer can purchases only during business hours and working days
-            if (DateTime.UtcNow.Hour < 8 || DateTime.UtcNow.Hour > 18 || DateTime.UtcNow.DayOfWeek == DayOfWeek.Saturday || DateTime.UtcNow.DayOfWeek == DayOfWeek.Sunday)
+            if (now.Hour < 8 || now.Hour > 18 || now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
                 return false;
 
 
