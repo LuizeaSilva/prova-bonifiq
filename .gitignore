@@ -366,3 +366,28 @@ FodyWeavers.xsd
 .sonar/
 .sonarqube/
 .scannerwork/
+
+# ---- macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ---- JetBrains Rider
+.idea/
+*.sln.iml
+
+# ---- VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

@@ -13,15 +13,21 @@ namespace ProvaPub.Controllers
 	public class Parte1Controller :  ControllerBase
 	{
 		private readonly RandomService _randomService;
+		int maxValue = 100;
 
 		public Parte1Controller(RandomService randomService)
 		{
 			_randomService = randomService;
 		}
 		[HttpGet]
-		public async Task<int> Index()
+		public async Task<ActionResult> Index()
 		{
-			return await _randomService.GetRandom();
+			var number = await _randomService.GetRandom(maxValue);
+			
+			if(number is null)
+				return BadRequest($"Não foi possível gerar um número único. Todos os números possíveis de 0 a {maxValue - 1} já foram gerados.");
+			
+			return Ok(number.Value);
 		}
 	}
 }

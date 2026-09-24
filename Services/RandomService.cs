@@ -6,24 +6,38 @@ namespace ProvaPub.Services
 {
 	public class RandomService
 	{
-		int seed;
-        TestDbContext _ctx;
-		public RandomService()
-        {
-            var contextOptions = new DbContextOptionsBuilder<TestDbContext>()
-    .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Teste;Trusted_Connection=True;")
-    .Options;
-            seed = Guid.NewGuid().GetHashCode();
-
-            _ctx = new TestDbContext(contextOptions);
-        }
-        public async Task<int> GetRandom()
+		private readonly TestDbContext _ctx;
+        
+		public RandomService(TestDbContext ctx)
 		{
-            var number =  new Random(seed).Next(100);
-            _ctx.Numbers.Add(new RandomNumber() { Number = number });
-            _ctx.SaveChanges();
+			_ctx = ctx;
+		}
+		
+        public async Task<int?> GetRandom(int maxValue)
+        {
+	        int number;
+	        
+	        var usedNumbers = await _ctx.Numbers.Select(x => x.Number).ToListAsync();
+	        
+	        if (usedNumbers.Count() >= maxValue)
+		        return null;
+	        
+	        do
+	        {
+		        number = GenerateRandomNumber(maxValue);
+		        
+	        } while (usedNumbers.Any(x => x == number));
+	        
+	        _ctx.Numbers.Add(new RandomNumber() { Number = number });
+            await _ctx.SaveChangesAsync();
+            
 			return number;
 		}
 
+        private int GenerateRandomNumber(int maxValue)
+        {
+	        int seed = Guid.NewGuid().GetHashCode();
+	        return new Random(seed).Next(maxValue);
+        }
 	}
 }
