@@ -1,8 +1,6 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
 using ProvaPub.Models;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace ProvaPub.Repository
 {
